@@ -48,5 +48,9 @@ def analyze():
     except Exception as e:
         return jsonify({'error': f'Could not process CSV: {str(e)}'}), 400
 
+@app.route('/')
+def index():
+    return "Energy backend is running!"
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
