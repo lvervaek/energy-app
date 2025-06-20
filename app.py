@@ -13,7 +13,14 @@ def analyze():
     file = request.files['file']
     try:
         # Read CSV (semicolon-delimited, handle EAN quotes)
-        df = pd.read_csv(file, sep=';', quotechar='"', skipinitialspace=True)
+        df = pd.read_csv(
+            file,
+            sep=';',
+            quoting=3,  # csv.QUOTE_NONE disables quote processing
+            engine='python'
+        )
+        df["Van (datum)"] = df["Van (datum)"].str.strip('"')
+        df["Omschrijving"] = df["Omschrijving"].str.strip('"')
 
         # Check required columns
         required_columns = [
