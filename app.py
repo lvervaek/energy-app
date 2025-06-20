@@ -50,7 +50,7 @@ def analyze():
 
 @app.route('/')
 def index():
-    return "Energy backend is running!"
+    return "Energy backend is running! xxxx"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
