@@ -19,8 +19,6 @@ def analyze():
             quoting=3,  # csv.QUOTE_NONE disables quote processing
             engine='python'
         )
-        df["Van (datum)"] = df["Van (datum)"].str.strip('"')
-        df["Omschrijving"] = df["Omschrijving"].str.strip('"')
 
         # Check required columns
         required_columns = [
@@ -29,7 +27,8 @@ def analyze():
         if not all(col in df.columns for col in required_columns):
             return jsonify({'error': 'Missing columns in CSV'}), 422
 
-        # Parse start datetime
+        # Parse dates and numbers
+        df['Volume'] = df['Volume'].str.replace(',', '.', regex=False).astype(float)
         df['datetime'] = pd.to_datetime(df['Van (datum)'] + ' ' + df['Van (tijdstip)'], dayfirst=True)
 
         # Add 'month' column
@@ -49,15 +48,46 @@ def analyze():
             "monthly_totals": group.to_dict(orient='records'),
             "max_afname_quarter": max_afname
         }
+        
+        data = data = {
+            "costBreakdown": {
+                "energy": 450.75,
+                "variableGrid": 200.50,
+                "capacityTariff": 180.00,
+                "fixedCosts": 120.25,
+                "taxes": 300.80,
+                "total": 1252.30
+            },
+            "monthlyData": [
+                {
+                    "month": "Jan",
+                    "energy": 45,
+                    "variableGrid": 20,
+                    "capacityTariff": 15,
+                    "fixedCosts": 10,
+                    "taxes": 25
+                },
+                {
+                    "month": "Feb",
+                    "energy": 42,
+                    "variableGrid": 19,
+                    "capacityTariff": 15,
+                    "fixedCosts": 10,
+                    "taxes": 24
+                },
+                # ... continue for all 12 months
+            ],
+            "analysisperiod": "Data analyzed for Jan 2024 to Dec 2024"
+        }
 
-        return jsonify(result), 200
+        return jsonify(data), 200
 
     except Exception as e:
         return jsonify({'error': f'Could not process CSV: {str(e)}'}), 400
 
 @app.route('/')
 def index():
-    return "Energy backend is running! xxxx"
+    return "Energy backend is running! xxxx loic"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
