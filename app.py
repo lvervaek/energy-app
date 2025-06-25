@@ -23,6 +23,8 @@ EXPECTED_COLUMNS = [
     "Eenheid", "Validatiestatus", "Omschrijving"
 ]
 
+print("hello world!")
+
 
 def is_csv_corrupted(df):
     if df.shape[1] > len(EXPECTED_COLUMNS): return True
@@ -120,7 +122,6 @@ def get_grid_costs(postal_code, dnb_postalcode_df, grid_and_levies_df):
 def compute_capacity_tariff(user_df, postal_code, dnb_postalcode_df, grid_and_levies_df):
     # 1. Get DNB from postal code
     matched_levies = get_grid_costs(postal_code, dnb_postalcode_df, grid_and_levies_df)
-
     # 2. Extract offtake rows and compute highest 15-min volume per month
     user_df = user_df.copy()
     user_df['month'] = user_df['datetime'].dt.to_period('M').dt.to_timestamp()
@@ -221,13 +222,14 @@ def analyze():
     
     df = load_user_meter_data(file)
     df_monthly = compute_montly_volumes(df)    
-    
+
     backend_name = resolve_supplier_backend_name(supplier, product)
     earliest, latest = df['datetime'].min(), df['datetime'].max()
     user_months = pd.date_range(start=earliest.replace(day=1), end=latest.replace(day=1), freq='MS')
     
     tariffs = prepare_product_tariffs(backend_name, user_months)
     indexed_tariffs = attach_market_indexes(tariffs)
+    
     energy_cost_df = compute_monthly_energy_costs(df, indexed_tariffs)
     capacity_df = compute_capacity_tariff(
         user_df=df,
